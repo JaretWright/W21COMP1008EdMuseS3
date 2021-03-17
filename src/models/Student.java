@@ -23,7 +23,7 @@ public class Student extends Person{
     public void addGrade(String courseCRN, int grade)
     {
         //valid crn -> "21106"  try to match the pattern
-        if (!courseCRN.matches("2//d//d//d//d"))
+        if (!courseCRN.matches("2[0-9]{4}"))
             throw new IllegalArgumentException("crn must have the pattern 2XXXX - where X is 0-9");
 
         if (grade >=0 && grade <=100)
@@ -45,6 +45,19 @@ public class Student extends Person{
         }
         return count;
     }
+
+    /**
+     * This method will return a grade for a specific course.  If the course is not listed
+     * for the student, it will return a value of -1
+     */
+    public int getGradeForCourse(String courseCRN)
+    {
+        if (grades.get(courseCRN) == null)
+            return -1;
+
+        return grades.get(courseCRN);
+    }
+
 
     /**
      * This method will return the average grade for a Student.
