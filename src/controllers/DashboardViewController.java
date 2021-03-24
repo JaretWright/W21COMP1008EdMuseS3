@@ -1,15 +1,22 @@
 package controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 import models.Course;
 import models.Professor;
 import models.Student;
 import utilities.DBUtility;
+import javafx.scene.Node;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -46,5 +53,18 @@ public class DashboardViewController implements Initializable {
 
         coursesListView.getItems().addAll(DBUtility.getCoursesFromDB());
         coursesLabel.setText(String.format("Courses: %d", coursesListView.getItems().size()));
+    }
+
+    @FXML
+    private void createNewStudent(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("../views/createStudentView.fxml"));
+        Scene scene = new Scene(root);
+
+        //get the Stage object from the ActionEvent that is triggered when the button is pushed
+        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.setTitle("EdMuse-Create Student");
+        stage.show();
     }
 }

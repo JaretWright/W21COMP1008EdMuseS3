@@ -4,6 +4,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import models.Person;
+import models.Student;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
