@@ -88,4 +88,9 @@ public class Course {
     public void setStudents(ArrayList<Student> students) {
         this.students = students;
     }
+
+    public String toString()
+    {
+        return String.format("%s-%s %s-%d students",crn,courseCode,courseName,students.size());
+    }
 }

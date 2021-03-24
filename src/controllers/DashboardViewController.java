@@ -4,6 +4,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.image.ImageView;
+import models.Course;
+import models.Professor;
 import models.Student;
 import utilities.DBUtility;
 
@@ -13,15 +16,35 @@ import java.util.ResourceBundle;
 public class DashboardViewController implements Initializable {
 
     @FXML
+    private ImageView logoImageView;
+
+    @FXML
     private Label studentsLabel;
 
     @FXML
     private ListView<Student> studentListView;
+
+    @FXML
+    private Label professorLabel;
+
+    @FXML
+    private ListView<Professor> professorsListView;
+
+    @FXML
+    private Label coursesLabel;
+
+    @FXML
+    private ListView<Course> coursesListView;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         studentListView.getItems().addAll(DBUtility.getStudentsFromDB());
         studentsLabel.setText(String.format("Students: %d", studentListView.getItems().size()));
 
+        professorsListView.getItems().addAll(DBUtility.getProfessorsFromDB());
+        professorLabel.setText(String.format("Professors: %d",professorsListView.getItems().size()));
+
+        coursesListView.getItems().addAll(DBUtility.getCoursesFromDB());
+        coursesLabel.setText(String.format("Courses: %d", coursesListView.getItems().size()));
     }
 }

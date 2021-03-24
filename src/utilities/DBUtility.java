@@ -1,5 +1,7 @@
 package utilities;
 
+import models.Course;
+import models.Professor;
 import models.Student;
 
 import java.time.LocalDate;
@@ -31,5 +33,43 @@ public class DBUtility {
         students.add(new Student("Greta","Tolbert","642 Front Street Toronto ON M5J 2N1", LocalDate.of(1957,12,18)));
         students.add(new Student("Barbara","Gable","3671 Scotchmere Dr Sarnia ON N7T 7T9", LocalDate.of(2002,11,13)));
         return students;
+    }
+
+    public static ArrayList<Professor> getProfessorsFromDB()
+    {
+        ArrayList<Professor> professors = new ArrayList<>();
+        professors.add(new Professor("Lois","Parker","674 Goyeau Ave Windsor ON N9A 1H9",LocalDate.of(1987,3,21)));
+        professors.add(new Professor("Ginger","Harris","3514 Yonge Street Toronto ON M4W 1J7",LocalDate.of(1967,11,12)));
+        professors.add(new Professor("Winchester","Solomon","3099 Balmy Beach Road Owen Sound ON N4K 2N7",LocalDate.of(1977,12,18)));
+        professors.add(new Professor("John","Pressley","1101 Eglinton Avenue Toronto ON M4P 1A6",LocalDate.of(1973,11,29)));
+        return professors;
+    }
+
+    public static ArrayList<Course> getCoursesFromDB()
+    {
+        ArrayList<Professor> professors = getProfessorsFromDB();
+        ArrayList<Student> students = getStudentsFromDB();
+        Course course1 = new Course("COMP 1008","21109","Intro to Objects",professors.get(0));
+        course1.addStudent(students.get(0));
+        course1.addStudent(students.get(1));
+        course1.addStudent(students.get(2));
+
+        Course course2 = new Course("COMP 1011","21110","Advanced Java",professors.get(1));
+        course2.addStudent(students.get(2));
+        course2.addStudent(students.get(3));
+        course2.addStudent(students.get(4));
+        course2.addStudent(students.get(5));
+
+        Course course3 = new Course("COMP 1030","21111","Programming Fundamentals",professors.get(1));
+        course2.addStudent(students.get(2));
+        course2.addStudent(students.get(3));
+        course2.addStudent(students.get(4));
+        course2.addStudent(students.get(5));
+
+        ArrayList<Course> courses = new ArrayList<>();
+        courses.add(course1);
+        courses.add(course2);
+        courses.add(course3);
+        return courses;
     }
  }
