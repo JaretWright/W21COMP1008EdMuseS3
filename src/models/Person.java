@@ -2,7 +2,6 @@ package models;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Locale;
 
 public class Person {
     private String firstName, lastName, address;
