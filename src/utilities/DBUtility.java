@@ -4,6 +4,7 @@ import models.Course;
 import models.Professor;
 import models.Student;
 
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,9 @@ import java.util.List;
  * This class will simulate getting information from a database
  */
 public class DBUtility {
+    private static String user = "student";
+    private static String password = "student";
+    private static String connString = "jdbc:mysql://localhost:3306/edmuse";
 
     public static List<String> getAvailableCourseCodes()
     {
@@ -23,15 +27,54 @@ public class DBUtility {
                 "COMP 2068");
     }
 
-    public static ArrayList<Student> getStudentsFromDB()
-    {
+    public static ArrayList<Student> getStudentsFromDB() throws SQLException {
         ArrayList<Student> students = new ArrayList<>();
-        students.add(new Student("Rose","Ruffner","3846 St. Paul StreetSt Catharines ON L2S 3A1", LocalDate.of(1975,8,27)));
-        students.add(new Student("Jack","Bradbury","867 rue des Églises Est Ste Cecile De Masham QC J0X 2W0", LocalDate.of(1979,10,14)));
-        students.add(new Student("Elanore","Sanders","1145 47th Avenue Grassland AB T0A 1V0", LocalDate.of(1940,9,25)));
-        students.add(new Student("Nancy","Walsh","1459 Harvest Moon Dr Unionville ON L3R 0L7", LocalDate.of(1999,1,12)));
-        students.add(new Student("Greta","Tolbert","642 Front Street Toronto ON M5J 2N1", LocalDate.of(1957,12,18)));
-        students.add(new Student("Barbara","Gable","3671 Scotchmere Dr Sarnia ON N7T 7T9", LocalDate.of(2002,11,13)));
+//        students.add(new Student("Rose","Ruffner","3846 St. Paul StreetSt Catharines ON L2S 3A1", LocalDate.of(1975,8,27)));
+//        students.add(new Student("Jack","Bradbury","867 rue des Églises Est Ste Cecile De Masham QC J0X 2W0", LocalDate.of(1979,10,14)));
+//        students.add(new Student("Elanore","Sanders","1145 47th Avenue Grassland AB T0A 1V0", LocalDate.of(1940,9,25)));
+//        students.add(new Student("Nancy","Walsh","1459 Harvest Moon Dr Unionville ON L3R 0L7", LocalDate.of(1999,1,12)));
+//        students.add(new Student("Greta","Tolbert","642 Front Street Toronto ON M5J 2N1", LocalDate.of(1957,12,18)));
+//        students.add();
+
+        //create objects to access and read from the DB
+        Connection conn = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+
+        try{
+            //1.  connect to the DB
+            conn = DriverManager.getConnection(connString, user, password);
+
+            //2.  create new Student("Barbara","Gable","3671 Scotchmere Dr Sarnia ON N7T 7T9", LocalDate.of(2002,11,13))a statement object
+            statement = conn.createStatement();
+
+            //3.  create / execute the query
+            resultSet = statement.executeQuery("SELECT * FROM students");
+
+            //4.  loop over the results
+            while (resultSet.next())
+            {
+                Student newStudent = new Student(resultSet.getString("firstName"),
+                                                 resultSet.getString("lastName"),
+                                                 resultSet.getString("address"),
+                                                 resultSet.getDate("birthday").toLocalDate());
+                students.add(newStudent);
+            }
+        } catch (SQLException e)
+        {
+            System.out.println("Database access issue: " + e.getMessage());
+        } catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        finally {
+            if (conn != null)
+                conn.close();
+            if (statement != null)
+                statement.close();
+            if (resultSet != null)
+                resultSet.close();
+        }
         return students;
     }
 
@@ -45,8 +88,7 @@ public class DBUtility {
         return professors;
     }
 
-    public static ArrayList<Course> getCoursesFromDB()
-    {
+    public static ArrayList<Course> getCoursesFromDB() throws SQLException {
         ArrayList<Professor> professors = getProfessorsFromDB();
         ArrayList<Student> students = getStudentsFromDB();
         Course course1 = new Course("COMP 1008","21109","Intro to Objects",professors.get(0));

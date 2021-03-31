@@ -18,6 +18,7 @@ import javafx.scene.Node;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class DashboardViewController implements Initializable {
@@ -45,14 +46,20 @@ public class DashboardViewController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        studentListView.getItems().addAll(DBUtility.getStudentsFromDB());
-        studentsLabel.setText(String.format("Students: %d", studentListView.getItems().size()));
+        try {
+            studentListView.getItems().addAll(DBUtility.getStudentsFromDB());
+            studentsLabel.setText(String.format("Students: %d", studentListView.getItems().size()));
 
-        professorsListView.getItems().addAll(DBUtility.getProfessorsFromDB());
-        professorLabel.setText(String.format("Professors: %d",professorsListView.getItems().size()));
+            professorsListView.getItems().addAll(DBUtility.getProfessorsFromDB());
+            professorLabel.setText(String.format("Professors: %d",professorsListView.getItems().size()));
 
-        coursesListView.getItems().addAll(DBUtility.getCoursesFromDB());
-        coursesLabel.setText(String.format("Courses: %d", coursesListView.getItems().size()));
+            coursesListView.getItems().addAll(DBUtility.getCoursesFromDB());
+            coursesLabel.setText(String.format("Courses: %d", coursesListView.getItems().size()));
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @FXML
