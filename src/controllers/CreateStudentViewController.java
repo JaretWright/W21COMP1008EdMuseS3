@@ -44,16 +44,17 @@ public class CreateStudentViewController implements Initializable {
                     birthdayDatePicker.getValue());
 
             //1. insert the student into the database
-            DBUtility.insertNewStudent(newStudent);
+            int studentNum = DBUtility.insertNewStudent(newStudent);
 
             //2. clear the fields
             //3. display the new student object
+            errMsgLabel.setText("Student Num: "+studentNum + " "+ newStudent.toString());
         } catch (IllegalArgumentException e)
         {
             errMsgLabel.setText(e.getMessage());
         } catch (Exception e)
         {
-            errMsgLabel.setText("Check all fields for values");
+            e.printStackTrace();
         }
 
     }
