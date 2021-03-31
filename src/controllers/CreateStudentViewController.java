@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import models.Student;
+import utilities.DBUtility;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -41,6 +42,12 @@ public class CreateStudentViewController implements Initializable {
                     lastNameTextField.getText(),
                     addressTextField.getText(),
                     birthdayDatePicker.getValue());
+
+            //1. insert the student into the database
+            DBUtility.insertNewStudent(newStudent);
+
+            //2. clear the fields
+            //3. display the new student object
         } catch (IllegalArgumentException e)
         {
             errMsgLabel.setText(e.getMessage());

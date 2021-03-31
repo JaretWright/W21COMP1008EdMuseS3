@@ -114,4 +114,34 @@ public class DBUtility {
         courses.add(course3);
         return courses;
     }
+
+    public static int insertNewStudent(Student student)
+    {
+        int studentNum = -1;
+        String sql = "INSERT INTO students (firstName, lastName, address, birthday) VALUES (?,?,?,?)";
+        try (
+                Connection conn = DriverManager.getConnection(connString, user, password);
+                PreparedStatement preparedStatement = conn.prepareStatement(sql, new String[]{"studentNum"});
+                )
+        {
+            //bind the values
+            preparedStatement.setString(1, student.getFirstName());
+            preparedStatement.setString(2, student.getLastName());
+            preparedStatement.setString(3, student.getAddress());
+            preparedStatement.setDate(4, Date.valueOf(student.getBirthday()));
+
+            //execute the insert statement
+            preparedStatement.executeUpdate();
+
+            //loop over the resultset and get the student number
+            ResultSet rs = preparedStatement.getGeneratedKeys();
+            while (rs.next())
+                studentNum = rs.getInt(1);
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return studentNum;
+    }
  }
