@@ -47,6 +47,8 @@ public class CreateStudentViewController implements Initializable {
             int studentNum = DBUtility.insertNewStudent(newStudent);
 
             //2. clear the fields
+            clearFields();
+
             //3. display the new student object
             errMsgLabel.setText("Student Num: "+studentNum + " "+ newStudent.toString());
         } catch (IllegalArgumentException e)
@@ -56,6 +58,13 @@ public class CreateStudentViewController implements Initializable {
         {
             e.printStackTrace();
         }
+    }
 
+    private void clearFields()
+    {
+        firstNameTextField.clear();
+        lastNameTextField.clear();
+        addressTextField.clear();
+        birthdayDatePicker.getEditor().clear();
     }
 }
