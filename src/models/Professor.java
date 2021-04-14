@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class Professor extends Person {
     private ArrayList<String> teachables;
+    private int professorID;
 
     /**
      * This is the constructor for the Professor class.  Because it extends the Person class,
@@ -18,6 +19,23 @@ public class Professor extends Person {
     public Professor(String firstName, String lastName, String address, LocalDate birthday) {
         super(firstName, lastName, address, birthday);
         teachables = new ArrayList<>();
+    }
+
+    public Professor(String firstName, String lastName, String address, LocalDate birthday, int professorID) {
+        super(firstName, lastName, address, birthday);
+        teachables = new ArrayList<>();
+        setProfessorID(professorID);
+    }
+
+    public int getProfessorID() {
+        return professorID;
+    }
+
+    public void setProfessorID(int professorID) {
+        if (professorID>0)
+            this.professorID = professorID;
+        else
+            throw new IllegalArgumentException("professorID must be greater than 0");
     }
 
     /**

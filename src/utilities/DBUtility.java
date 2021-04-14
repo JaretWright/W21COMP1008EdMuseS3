@@ -4,6 +4,7 @@ import models.Course;
 import models.Professor;
 import models.Student;
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,13 +19,29 @@ public class DBUtility {
     private static String password = "student";
     private static String connString = "jdbc:mysql://localhost:3306/edmuse";
 
-    public static List<String> getAvailableCourseCodes()
+    public static ArrayList<String> getAvailableCourseCodes()
     {
-        return Arrays.asList("COMP 1002", "COMP 1030", "COMP 1035", "COMP 1045",
-                "COMP 1045", "MATH 1003", "COMP 1006", "COMP 1008",
-                "COMP 1098", "COMP 2003", "ENTR 1002", "COMP 1009",
-                "COMP 1011", "COMP 1073", "COMP 2084", "COMP 3002",
-                "COMP 2068");
+        ArrayList<String> courseCodes = new ArrayList<>();
+
+        //connect to the DB
+        try(
+                Connection conn = DriverManager.getConnection(connString, user, password);
+                Statement statement = conn.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM approvedCourses");
+                )
+        {
+            //get a list of courses, add them to the arrayList and return them
+            while (resultSet.next())
+            {
+                courseCodes.add(resultSet.getString("courseCode"));
+            }
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return courseCodes;
     }
 
     public static ArrayList<Student> getStudentsFromDB() throws SQLException {
@@ -40,6 +57,7 @@ public class DBUtility {
         Connection conn = null;
         Statement statement = null;
         ResultSet resultSet = null;
+        ResultSet gradesResultSet = null;
 
         try{
             //1.  connect to the DB
@@ -74,6 +92,8 @@ public class DBUtility {
                 statement.close();
             if (resultSet != null)
                 resultSet.close();
+            if (gradesResultSet != null)
+                gradesResultSet.close();
         }
         return students;
     }
@@ -187,4 +207,167 @@ public class DBUtility {
         }
         return studentNum;
     }
- }
+
+    public static int insertNewProfessor(Professor professor) throws SQLException {
+        int professorID = -1;
+        String sql = "INSERT INTO professors (firstName, lastName, address, birthday) VALUES (?,?,?,?)";
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+        try (
+                Connection conn = DriverManager.getConnection(connString, user, password);
+        )
+        {
+            preparedStatement = conn.prepareStatement(sql, new String[]{"professorID"});
+
+            //bind the values
+            preparedStatement.setString(1, professor.getFirstName());
+            preparedStatement.setString(2, professor.getLastName());
+            preparedStatement.setString(3, professor.getAddress());
+            preparedStatement.setDate(4, Date.valueOf(professor.getBirthday()));
+
+            //execute the insert statement
+            preparedStatement.executeUpdate();
+
+            //loop over the resultset and get the student number
+            rs = preparedStatement.getGeneratedKeys();
+            while (rs.next())
+                professorID = rs.getInt(1);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally {
+            if (rs != null)
+                rs.close();
+            if(preparedStatement != null)
+                preparedStatement.close();
+        }
+        return professorID;
+    }
+
+    public static int insertNewCourse(Course course) throws SQLException {
+        int crn = -1;
+        String sql = "INSERT INTO courses (courseCode,professorID) VALUES (?,?)";
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+        try (
+                Connection conn = DriverManager.getConnection(connString, user, password);
+        )
+        {
+            preparedStatement = conn.prepareStatement(sql, new String[]{"crn"});
+
+            //bind the values
+            preparedStatement.setString(1, course.getCourseCode());
+            preparedStatement.setInt(2, course.getProf().getProfessorID());
+
+            //execute the insert statement
+            preparedStatement.executeUpdate();
+
+            //loop over the resultset and get the student number
+            rs = preparedStatement.getGeneratedKeys();
+            while (rs.next())
+                crn = rs.getInt(1);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally {
+            if (rs != null)
+                rs.close();
+            if(preparedStatement != null)
+                preparedStatement.close();
+        }
+        return crn;
+    }
+
+    public static void addTeachable(Professor professor, String courseCode)
+    {
+        try(
+                Connection conn = DriverManager.getConnection(connString,user,password);
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO approvedToTeach (professorID, courseCode) VALUES (?,?)");
+                )
+        {
+            //bind the values
+            statement.setInt(1, professor.getProfessorID());
+            statement.setString(2, courseCode);
+
+            statement.executeUpdate();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This method will return the name of a course, given the course code
+     */
+    public static String getCourseName(String courseCode)
+    {
+        String courseName = "";
+        ResultSet resultSet = null;
+
+        try(
+                Connection conn = DriverManager.getConnection(connString, user, password);
+                PreparedStatement statement = conn.prepareStatement("SELECT * FROM approvedCourses WHERE courseCode = ?");
+                )
+        {
+            statement.setString(1, courseCode);
+            resultSet = statement.executeQuery();
+
+            //loop over the result set (even though there is only 1 record returned)
+            while (resultSet.next())
+                courseName=resultSet.getString("courseName");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return courseName;
+    }
+
+    public static ArrayList<Professor> professorCanTeach(String courseCode)
+    {
+        ArrayList<Professor> professors = new ArrayList<>();
+        ResultSet resultSet = null;
+
+        String sql = "SELECT * FROM professors INNER JOIN approvedToTeach ON professors.professorID = approvedToTeach.professorID " +
+                        "WHERE courseCode = ?";
+
+        try(
+                Connection conn = DriverManager.getConnection(connString, user, password);
+                PreparedStatement statement = conn.prepareStatement(sql);
+        )
+        {
+            statement.setString(1, courseCode);
+            resultSet = statement.executeQuery();
+
+            //loop over the result set (even though there is only 1 record returned)
+            while (resultSet.next())
+                professors.add(new Professor(resultSet.getString("firstName"),
+                                            resultSet.getString("lastName"),
+                                            resultSet.getString("address"),
+                                            resultSet.getDate("birthday").toLocalDate(),
+                                            resultSet.getInt("professorID")));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return professors;
+    }
+
+    /**
+     * This returns a list of majors (unfiltered)
+     * @return
+     */
+    public static ArrayList<String> getMajors()
+    {
+        ArrayList<String> majors = new ArrayList<>();
+        majors.addAll(Arrays.asList("Acupuncture","Advanced Care Paramedic","Architectural Technology",
+                "Art and Design Fundamentals","Artificial Intelligence", "Aviation Management","Computer Science"));
+        return majors;
+    }
+}

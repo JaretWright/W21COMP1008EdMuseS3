@@ -9,13 +9,13 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class SceneBuilder {
+public class SceneChanger {
 
     /**
      * This method will allows us to change scenes
      */
     public static void changeScenes(ActionEvent event, String viewName, String title ) throws IOException {
-        Parent root = FXMLLoader.load(new Object().getClass().getResource(viewName));
+        Parent root = FXMLLoader.load(SceneChanger.class.getResource(viewName));
         Scene scene = new Scene(root);
 
         //get the Stage object from the ActionEvent that is triggered when the button is pushed

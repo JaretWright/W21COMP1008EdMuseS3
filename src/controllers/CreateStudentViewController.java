@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -14,8 +15,11 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import models.Student;
 import utilities.DBUtility;
+import utilities.SceneChanger;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 public class CreateStudentViewController implements Initializable {
@@ -35,9 +39,13 @@ public class CreateStudentViewController implements Initializable {
     @FXML
     private Label errMsgLabel;
 
+    @FXML
+    private ComboBox<String> majorComboBox;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         errMsgLabel.setText("");
+        majorComboBox.getItems().addAll(DBUtility.getMajors());
     }
 
     @FXML
@@ -57,9 +65,9 @@ public class CreateStudentViewController implements Initializable {
 
             //3. display the new student object
             errMsgLabel.setText("Student Num: "+studentNum + " "+ newStudent.toString());
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException exception)
         {
-            errMsgLabel.setText(e.getMessage());
+            errMsgLabel.setText(exception.getMessage());
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -75,8 +83,13 @@ public class CreateStudentViewController implements Initializable {
     }
 
     @FXML
-    private void changeToDashboard(ActionEvent event)
-    {
+    private void changeToDashboard(ActionEvent event) throws IOException {
+        SceneChanger.changeScenes(event, "../views/dashboardView.fxml","Edmuse");
+    }
 
+    @FXML
+    private void majorSelected()
+    {
+        errMsgLabel.setText("Major selected: "+ majorComboBox.getValue());
     }
 }

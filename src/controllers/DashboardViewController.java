@@ -6,15 +6,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import models.Course;
 import models.Professor;
 import models.Student;
 import utilities.DBUtility;
 import javafx.scene.Node;
+import utilities.SceneChanger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -32,11 +34,11 @@ public class DashboardViewController implements Initializable {
     @FXML
     private ListView<Student> studentListView;
 
-    @FXML
-    private Label professorLabel;
+//    @FXML
+//    private Label professorLabel;
 
-    @FXML
-    private ListView<Professor> professorsListView;
+//    @FXML
+//    private ListView<Professor> professorsListView;
 
     @FXML
     private Label coursesLabel;
@@ -44,14 +46,62 @@ public class DashboardViewController implements Initializable {
     @FXML
     private ListView<Course> coursesListView;
 
+
+    @FXML
+    private GridPane studentGridPane;
+
+    @FXML
+    private Label nameLabel;
+
+    @FXML
+    private Label avgGradeLabel;
+
+    @FXML
+    private Label completedLabel;
+
+    private Student studentSelected;
+
+    @FXML
+    private TableView<Professor> profTableView;
+
+    @FXML
+    private TableColumn<Professor, String> firstNameColumn;
+
+    @FXML
+    private TableColumn<Professor, String> lastNameColumn;
+
+    @FXML
+    private TableColumn<Professor, String> addressColumn;
+
+    @FXML
+    private TableColumn<Professor, Integer> ageColumn;
+
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //configure the student list to only allow 1 Student to be selected at a time
+        studentListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        //configure the table columns
+        firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
+        ageColumn.setCellValueFactory(new PropertyValueFactory<>("age"));
+
+        //load the data into the table
+        try {
+            profTableView.getItems().addAll(DBUtility.getProfessorsFromDB());
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
         try {
             studentListView.getItems().addAll(DBUtility.getStudentsFromDB());
             studentsLabel.setText(String.format("Students: %d", studentListView.getItems().size()));
 
-            professorsListView.getItems().addAll(DBUtility.getProfessorsFromDB());
-            professorLabel.setText(String.format("Professors: %d",professorsListView.getItems().size()));
+//            professorsListView.getItems().addAll(DBUtility.getProfessorsFromDB());
+//            professorLabel.setText(String.format("Professors: %d",professorsListView.getItems().size()));
 
             coursesListView.getItems().addAll(DBUtility.getCoursesFromDB());
             coursesLabel.setText(String.format("Courses: %d", coursesListView.getItems().size()));
@@ -60,18 +110,40 @@ public class DashboardViewController implements Initializable {
         {
             e.printStackTrace();
         }
+
+        //unless a student is selected, do no show the gridpane with student info.
+        studentGridPane.setVisible(false);
     }
 
     @FXML
     private void createNewStudent(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("../views/createStudentView.fxml"));
-        Scene scene = new Scene(root);
+        SceneChanger.changeScenes(event, "../views/createStudentView.fxml","EdMuse-Create Student" );
+    }
 
-        //get the Stage object from the ActionEvent that is triggered when the button is pushed
-        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+    @FXML
+    private void createProfessorButton(ActionEvent event) throws IOException{
+        SceneChanger.changeScenes(event, "../views/createProfessorView.fxml","EdMuse-Create Professor" );
+    }
 
-        stage.setScene(scene);
-        stage.setTitle("EdMuse-Create Student");
-        stage.show();
+    @FXML
+    private void createCourseButton(ActionEvent event) throws IOException{
+        SceneChanger.changeScenes(event, "../views/createCourseView.fxml","EdMuse-Create Course" );
+    }
+
+    /**
+     * When a student is selected from the listView, show their information on the dashboard
+     */
+    @FXML
+    private void studentSelected()
+    {
+        studentSelected = studentListView.getSelectionModel().getSelectedItem();
+
+        if (studentSelected != null)
+        {
+            studentGridPane.setVisible(true);
+            nameLabel.setText(studentSelected.getFirstName() + " " + studentSelected.getLastName());
+            avgGradeLabel.setText(String.format("%.1f%%",studentSelected.getAvgGrade()));
+            completedLabel.setText(Integer.toString(studentSelected.getNumCoursesPassed()));
+        }
     }
 }

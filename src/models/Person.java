@@ -62,7 +62,7 @@ public class Person {
         this.birthday = birthday;
     }
 
-    public int getAge()
+    public Integer getAge()
     {
         return Period.between(birthday, LocalDate.now()).getYears();
     }

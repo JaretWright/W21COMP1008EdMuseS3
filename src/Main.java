@@ -12,7 +12,7 @@ import java.util.TreeMap;
 
 public class Main extends Application {
     public static void main(String[] args) {
-        launch(args);
+          launch(args);
 //        Person p1 = new Person("Fred","Flintstone","1 Bedrock", LocalDate.of(1986,3,17));
 //        Person p2 = new Person("Wilma","Flintstone","1 Bedrock", LocalDate.of(1986,3,18));
 //

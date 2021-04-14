@@ -8,8 +8,12 @@ public class Course {
     private ArrayList<Student> students;
 
     public Course(String courseCode, String crn, String courseName, Professor prof) {
-        setCourseCode(courseCode);
+        this(courseCode, courseName, prof);
         setCrn(crn);
+    }
+
+    public Course(String courseCode, String courseName, Professor prof) {
+        setCourseCode(courseCode);
         setCourseName(courseName);
         setProf(prof);
         students = new ArrayList<>();
@@ -67,7 +71,7 @@ public class Course {
 
     public void setCourseName(String courseName) {
         courseName = courseName.trim();
-        if (courseName.length()>=2 && courseName.length()<=50)
+        if (courseName.length()>=2 && courseName.length()<=60)
             this.courseName = courseName;
         else
             throw new IllegalArgumentException("name must be 2-50 characters");
